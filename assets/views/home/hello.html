@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GitCrab</title>
+    <style>
+        body {
+            font-family: monospace;
+            background: #0d1117;
+            color: #c9d1d9;
+            text-align: center;
+            margin: 2rem;
+        }
+        .ascii-art {
+            white-space: pre;
+            font-size: 12px;
+            line-height: 1.2;
+            margin: 2rem 0;
+            color: #58a6ff;
+        }
+        nav {
+            margin: 2rem 0;
+        }
+        a {
+            color: #58a6ff;
+            text-decoration: none;
+            margin: 0 1rem;
+        }
+        .auth-section {
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="ascii-art">
+  _____ _ _   _____      _     
+ / ____(_) | / ____|    | |    
+| |  __ _| |_| |     ___| |__  
+| | |_ | | __| |    / __| '_ \ 
+| |__| | | |_| |____\__ \ |_) |
+ \_____|_|\__|\_____|___/_.__/ 
+    </div>
+    
+    <h1>Welcome to GitCrab</h1>
+    <p>A GitHub-like service built with Rust</p>
+
+    <nav>
+        <a href="/">Home</a>
+        {% if user %}
+            <a href="/repos">My Repos</a>
+            <a href="/logout">Logout</a>
+        {% else %}
+            <a href="/login">Login</a>
+            <a href="/register">Register</a>
+        {% endif %}
+    </nav>
+
+    <div class="auth-section">
+        {% if user %}
+            <p>Logged in as <strong>{{ user.username }}</strong></p>
+        {% else %}
+            <p>Get started by creating an account!</p>
+        {% endif %}
+    </div>
+</body>
+</html>
+
