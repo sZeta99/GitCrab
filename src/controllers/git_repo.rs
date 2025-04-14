@@ -1,7 +1,7 @@
 #![allow(clippy::missing_errors_doc)]
 #![allow(clippy::unnecessary_struct_initialization)]
 #![allow(clippy::unused_async)]
-use loco_rs::prelude::*;
+use loco_rs::{controller::middleware, prelude::*};
 use serde::{Deserialize, Serialize};
 use axum::response::Redirect;
 use axum_extra::extract::Form;
@@ -33,6 +33,7 @@ async fn load_item(ctx: &AppContext, id: i32) -> Result<Model> {
 
 #[debug_handler]
 pub async fn list(
+    auth: middleware::auth::JWT,
     ViewEngine(v): ViewEngine<TeraView>,
     State(ctx): State<AppContext>,
 ) -> Result<Response> {
@@ -45,6 +46,7 @@ pub async fn list(
 
 #[debug_handler]
 pub async fn new(
+    auth: middleware::auth::JWT,
     ViewEngine(v): ViewEngine<TeraView>,
     State(_ctx): State<AppContext>,
 ) -> Result<Response> {
@@ -53,6 +55,7 @@ pub async fn new(
 
 #[debug_handler]
 pub async fn update(
+    auth: middleware::auth::JWT,
     Path(id): Path<i32>,
     State(ctx): State<AppContext>,
     Form(params): Form<Params>,
@@ -66,6 +69,7 @@ pub async fn update(
 
 #[debug_handler]
 pub async fn edit(
+    auth: middleware::auth::JWT,
     Path(id): Path<i32>,
     ViewEngine(v): ViewEngine<TeraView>,
     State(ctx): State<AppContext>,
@@ -76,16 +80,19 @@ pub async fn edit(
 
 #[debug_handler]
 pub async fn show(
+    auth: middleware::auth::JWT,
     Path(id): Path<i32>,
     ViewEngine(v): ViewEngine<TeraView>,
     State(ctx): State<AppContext>,
 ) -> Result<Response> {
+
     let item = load_item(&ctx, id).await?;
     views::git_repo::show(&v, &item)
 }
 
 #[debug_handler]
 pub async fn add(
+    auth: middleware::auth::JWT,
     State(ctx): State<AppContext>,
     Form(params): Form<Params>,
 ) -> Result<Redirect> {

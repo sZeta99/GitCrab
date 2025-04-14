@@ -39,6 +39,16 @@ impl CurrentResponse {
             email: user.email.clone(),
         }
     }
+
 }
+pub fn login_view(v: &impl ViewRenderer) -> Result<Response> {
+    format::render().view(v, "auth/login.html", data!({}))
+}
+
+
+pub fn register_view(v: &impl ViewRenderer) -> Result<Response> {
+    format::render().view(v, "auth/register.html", data!({}))
+}
+
 
 
