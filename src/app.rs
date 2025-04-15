@@ -46,9 +46,10 @@ impl Hooks for App {
     }
 
     async fn initializers(_ctx: &AppContext) -> Result<Vec<Box<dyn Initializer>>> {
-        Ok(vec![Box::new(
-            initializers::view_engine::ViewEngineInitializer,
-        )])
+        Ok(vec![
+            Box::new(initializers::view_engine::ViewEngineInitializer),
+            Box::new(initializers::axum_session::AxumSessionInitializer)
+        ])
     }
 
     fn routes(_ctx: &AppContext) -> AppRoutes {
@@ -60,21 +61,8 @@ impl Hooks for App {
             .add_route(controllers::auth::routes())
             .add_route(controllers::home::routes())
     }
-    async fn after_routes(router: Router, _ctx: &AppContext) -> Result<Router> {
-        // Configure session
-        let session_config = SessionConfig::default()
-            .with_cookie_path("loco_session")
-            .with_secure(false); // set to true in production with HTTPS
-
-        // Create session store
-        let session_store =
-            axum_session::SessionStore::<axum_session::SessionNullPool>::new(None, session_config)
-                .await
-                .unwrap();
 
 
-        Ok(router.layer(SessionLayer::new(session_store)))
-    }
     async fn connect_workers(ctx: &AppContext, queue: &Queue) -> Result<()> {
         queue.register(DownloadWorker::build(ctx)).await?;
         Ok(())

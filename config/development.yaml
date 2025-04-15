@@ -96,6 +96,10 @@ database:
 auth:
   # JWT authentication
   jwt:
+    location: 
+      from: Cookie
+      name: auth-token
+
     # Secret key for token generation and verification
     secret: NtdrvhOLA6kIM9LRdsAF
     # Token expiration time in seconds

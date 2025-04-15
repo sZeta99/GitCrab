@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<html>
+<!DOCTYPE html><html>
 <head>
     <title>Login</title>
 </head>
@@ -10,47 +9,47 @@
         <input type="password" name="password" placeholder="Password" required>
         <button type="submit">Login</button>
     </form>
-    <p>Don't have an account? <a href="/register">Register</a></p>
-
-    <script>
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
+    <p>Don't have an account? <a href="/register">Register</a></p><script>
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const formData = {
+            email: e.target.email.value,
+            password: e.target.password.value
+        };
+        
+        try {
+            const response = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData),
+                credentials: 'include' // Required for cookies to be set
+            });
             
-            const formData = {
-                email: e.target.email.value,
-                password: e.target.password.value
-            };
-            
-            try {
-                const response = await fetch('/api/auth/login', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(formData)
-                });
+            if (response.ok) {
+                const data = await response.json();
+                // Set cookie manually as fallback (though server should set it)
+                document.cookie = `auth-token=${data.token}; path=/; max-age=604800; secure; samesite=strict`;
                 
-                if (response.ok) {
-                    const data = await response.json();
-                    // Store token in localStorage or sessionStorage
-                    localStorage.setItem('authToken', data.token);
-                    // Store user data in sessionStorage
-                    sessionStorage.setItem('userPid', data.pid);
-                    sessionStorage.setItem('userName', data.name);
-                    sessionStorage.setItem('isVerified', data.is_verified);
-                    
-                    // Redirect to dashboard
-                    window.location.href = '/git_repos';
-                } else {
-                    alert('Login failed. Please check your credentials.');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('An error occurred during login.');
+                // Store user data in sessionStorage
+                sessionStorage.setItem('userPid', data.pid);
+                sessionStorage.setItem('userName', data.name);
+                sessionStorage.setItem('isVerified', data.is_verified);
+                
+                // Redirect to dashboard
+                window.location.href = '/git_repos';
+            } else {
+                alert('Login failed. Please check your credentials.');
             }
-        });
-    </script>
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred during login.');
+        }
+    });
+</script>
+
+
 </body>
 </html>
-
-
