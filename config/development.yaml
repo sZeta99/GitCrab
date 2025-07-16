@@ -104,3 +104,12 @@ auth:
     secret: NtdrvhOLA6kIM9LRdsAF
     # Token expiration time in seconds
     expiration: 604800 # 7 days
+git:
+
+  repo_base_path: "/home/git/repositories"
+
+  git_home: "/home/git"
+
+  git_user: "git"
+
+  git_shell_command: "/home/git/git-shell-commands/git-serve"

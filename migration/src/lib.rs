@@ -13,7 +13,6 @@ impl MigratorTrait for Migrator {
         vec![
             Box::new(m20220101_000001_users::Migration),
             Box::new(m20250411_134017_git_repos::Migration),
-
             // inject-above (do not remove this comment)
         ]
     }

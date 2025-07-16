@@ -1,8 +1,6 @@
-version: '3.8'
-
 services:
   db:
-    image: postgres:15
+    image: postgres:15.3-alpine
     container_name: gitcrab-db
     environment:
       POSTGRES_USER: loco
@@ -17,6 +15,8 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    networks:
+      - db
 
   app:
     build:
@@ -29,11 +29,22 @@ services:
     environment:
       DATABASE_URL: "postgres://loco:loco@db:5432/gitcrab_development"
     ports:
-      - "5150:5150"
+      - "5150:5150"  # Your app port
+      - "22:22"    # SSH port for Git
     volumes:
       - ./config:/usr/app/config
       - ./assets:/usr/app/assets
+      - git_repositories:/home/git/repositories  # Persist Git repositories
+      - git_ssh_keys:/home/git/.ssh              # Persist SSH keys
+    networks:
+      - db
+    env_file:
+      - .env
 
 volumes:
   postgres_data:
+  git_repositories:  # For Git repositories persistence
+  git_ssh_keys:      # For SSH keys persistence
 
+networks:
+  db:
