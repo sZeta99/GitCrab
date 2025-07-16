@@ -14,6 +14,7 @@ chmod 600 /home/git/.ssh/authorized_keys
 chmod 755 /home/git/repositories
 chmod 755 /home/git/git-shell-commands
 chmod +x /home/git/git-shell-commands/git-serve
+ln -s /home/git/repositories /repositories
 
 # Start SSH server
 log_message "Starting SSH server..."
