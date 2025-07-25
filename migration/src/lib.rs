@@ -5,6 +5,8 @@ mod m20220101_000001_users;
 
 mod m20250411_134017_git_repos;
 
+mod m20250723_124647_repositories;
+mod m20250723_132234_ssh_keys;
 pub struct Migrator;
 
 #[async_trait::async_trait]
@@ -13,6 +15,8 @@ impl MigratorTrait for Migrator {
         vec![
             Box::new(m20220101_000001_users::Migration),
             Box::new(m20250411_134017_git_repos::Migration),
+            Box::new(m20250723_124647_repositories::Migration),
+            Box::new(m20250723_132234_ssh_keys::Migration),
             // inject-above (do not remove this comment)
         ]
     }

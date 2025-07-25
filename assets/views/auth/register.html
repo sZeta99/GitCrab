@@ -1,16 +1,86 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Register</title>
+  <meta charset="UTF-8">
+  <title>Register</title>
+  <style>
+    body { font-family: sans-serif; margin:2rem; }
+    .form-group { margin-bottom:1rem; }
+    label { display:block; margin-bottom:.5rem; }
+    input { width:100%; padding:.5rem; box-sizing:border-box; }
+    button { padding:.5rem 1rem; }
+    .msg { margin-top:1rem; }
+    .msg.error { color:red; }
+    .msg.success { color:green; }
+  </style>
 </head>
 <body>
-    <h1>Register</h1>
-    <form action="/register" method="POST">
-        <input type="text" name="username" placeholder="Username" required>
-        <input type="password" name="password" placeholder="Password" required>
-        <button type="submit">Register</button>
-    </form>
-    <p>Already have an account? <a href="/login">Login</a></p>
+  <h1>Register</h1>
+  <form id="registerForm">
+    <div class="form-group">
+      <label for="name">Username</label>
+      <input id="name" type="text" name="name" required>
+    </div>
+    <div class="form-group">
+      <label for="email">Email</label>
+      <input id="email" type="email" name="email" required>
+    </div>
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input id="password" type="password" name="password" required>
+    </div>
+    <button type="submit">Register</button>
+    <div id="responseMessage" class="msg"></div>
+  </form>
+  <p>Already have an account? <a href="/login">Login</a></p>
+
+  <script>
+  document.getElementById('registerForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const msgEl = document.getElementById('responseMessage');
+    msgEl.textContent = '';
+    msgEl.className = 'msg';
+
+    const payload = {
+      name: e.target.name.value.trim(),
+      email: e.target.email.value.trim(),
+      password: e.target.password.value
+    };
+
+    try {
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json','Accept':'application/json'},
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) {
+        if (res.status === 400) {
+          throw new Error('Registration failed. Email may already be in use.');
+        } else if (res.status === 422) {
+          throw new Error('Invalid input. Please check your details.');
+        }
+        throw new Error(`Server responded ${res.status}`);
+      }
+
+      // Registration successful
+      msgEl.textContent = 'Registration successful! Please check your email to verify your account.';
+      msgEl.classList.add('success');
+
+      // Clear the form
+      e.target.reset();
+
+      // Optional: redirect to login after a delay
+      setTimeout(() => {
+        window.location.href = '/login';
+      }, 3000);
+
+    } catch (err) {
+      console.error(err);
+      msgEl.textContent = err.message;
+      msgEl.classList.add('error');
+    }
+  });
+  </script>
 </body>
 </html>
-

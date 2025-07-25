@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}
+View repository: {{ item.id }}
+{% endblock title %}
+
+{% block page_title %}
+View repository: {{ item.id }}
+{% endblock page_title %}
+
+
+{% block content %}
+<div class="mb-10">
+    <div>
+    <label><b>{{"name" | capitalize }}:</b> {{item.name}}</label>
+    </div>
+<div>
+    <label><b>{{"description" | capitalize }}:</b> {{item.description}}</label>
+    </div>
+<div>
+    <label><b>{{"owner_id" | capitalize }}:</b> {{item.owner_id}}</label>
+    </div>
+<div>
+    <label><b>{{"is_private" | capitalize }}:</b> {{item.is_private}}</label>
+    </div>
+<div>
+    <label><b>{{"default_branch" | capitalize }}:</b> {{item.default_branch}}</label>
+    </div>
+<div>
+    <label><b>{{"clone_url" | capitalize }}:</b> {{item.clone_url}}</label>
+    </div>
+<div>
+    <label><b>{{"ssh_url" | capitalize }}:</b> {{item.ssh_url}}</label>
+    </div>
+<div>
+    <label><b>{{"size_kb" | capitalize }}:</b> {{item.size_kb}}</label>
+    </div>
+<br />
+<a href="/repositories">Back to repositories</a>
+</div>
+{% endblock content %}
