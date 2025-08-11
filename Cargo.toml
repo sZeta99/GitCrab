@@ -13,6 +13,7 @@ default-run = "gitcrab-cli"
 loco-rs = { version = "0.15" }
 
 [dependencies]
+anyhow='*'
 loco-rs = { workspace = true  }
 serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1" }

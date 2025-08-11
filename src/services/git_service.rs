@@ -9,7 +9,6 @@ pub struct GitService {
     pub repo_base_path: PathBuf,
     pub git_user: String,
 }
-
 impl GitService {
     pub fn new(repo_base_path: PathBuf, git_user: String) -> Self {
         Self {
@@ -17,6 +16,7 @@ impl GitService {
             git_user,
         }
     }
+    
 
     pub async fn create_bare_repository(&self, name: &str) -> Result<PathBuf> {
         let repo_name = format!("{}.git", name);
@@ -47,15 +47,15 @@ impl GitService {
         }
 
         // Set proper ownership
-        let chown_output = Command::new("chown")
-            .args(["-R", &format!("{}:{}", self.git_user, self.git_user)])
-            .arg(&repo_path)
-            .output()?;
+       // let chown_output = Command::new("chown")
+       //     .args(["-R", &format!("{}:{}", self.git_user, self.git_user)])
+       //     .arg(&repo_path)
+       //     .output()?;
 
-        if !chown_output.status.success() {
-            warn!("Failed to set repository ownership: {}", 
-                  String::from_utf8_lossy(&chown_output.stderr));
-        }
+       // if !chown_output.status.success() {
+       //     warn!("Failed to set repository ownership: {}", 
+       //           String::from_utf8_lossy(&chown_output.stderr));
+       // }
 
         // Configure repository
         self.configure_repository(&repo_path).await?;
@@ -98,34 +98,6 @@ impl GitService {
         info!("Successfully deleted repository: {}", repo_name);
 
         Ok(())
-    }
-
-    pub async fn get_repository_size(&self, name: &str) -> Result<u64> {
-        let repo_name = format!("{}.git", name);
-        let repo_path = self.repo_base_path.join(&repo_name);
-
-        if !repo_path.exists() {
-            return Err(anyhow!("Repository '{}' does not exist", name));
-        }
-
-        let size = self.calculate_directory_size(&repo_path).await?;
-        Ok(size)
-    }
-
-    async fn calculate_directory_size(&self, path: &Path) -> Result<u64> {
-        let mut total_size = 0u64;
-        let mut entries = fs::read_dir(path).await?;
-
-        while let Some(entry) = entries.next_entry().await? {
-            let metadata = entry.metadata().await?;
-            if metadata.is_dir() {
-                total_size += self.calculate_directory_size(&entry.path()).await?;
-            } else {
-                total_size += metadata.len();
-            }
-        }
-
-        Ok(total_size)
     }
 
     pub async fn list_repositories(&self) -> Result<Vec<String>> {

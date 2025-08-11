@@ -1,6 +1,9 @@
 #![allow(clippy::missing_errors_doc)]
 #![allow(clippy::unnecessary_struct_initialization)]
 #![allow(clippy::unused_async)]
+use std::path::PathBuf;
+
+use chrono::{DateTime, FixedOffset, Local, TimeZone, Utc};
 use loco_rs::{controller::middleware, prelude::*};
 use serde::{Deserialize, Serialize};
 use axum::response::Redirect;
@@ -9,8 +12,7 @@ use sea_orm::{sea_query::Order, QueryOrder};
 use axum::debug_handler;
 
 use crate::{
-    models::_entities::git_repos::{ActiveModel, Column, Entity, Model},
-    views,
+    models::_entities::git_repos::{ActiveModel, Column, Entity, Model}, services::git_service::GitService, views
 };
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -96,10 +98,17 @@ pub async fn add(
     State(ctx): State<AppContext>,
     Form(params): Form<Params>,
 ) -> Result<Redirect> {
-    let mut item = ActiveModel {
-        ..Default::default()
+
+    let service = GitService::new(PathBuf::new().join(env!("REPO_BASE_PATH")),"user".to_string());
+    let path = service.create_bare_repository(&params.name.clone().unwrap()).await;
+    let local_now = Local::now();
+    let item = ActiveModel { 
+        created_at: ActiveValue::set(local_now.with_timezone(local_now.offset())), 
+        updated_at: ActiveValue::set(local_now.with_timezone(local_now.offset())), 
+        id: ActiveValue::set(0), 
+        name:  ActiveValue::set(params.name.clone()), 
+        path:  ActiveValue::set(Some(path.unwrap().to_string_lossy().to_string()))
     };
-    params.update(&mut item);
     item.insert(&ctx.db).await?;
     Ok(Redirect::to("git_repos"))
 }

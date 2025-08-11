@@ -3,6 +3,5 @@
 pub mod prelude;
 
 pub mod git_repos;
-pub mod repositories;
 pub mod ssh_keys;
 pub mod users;
