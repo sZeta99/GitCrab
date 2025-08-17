@@ -13,19 +13,35 @@
 </head>
 
 <body class="min-h-screen bg-background font-sans antialiased">
-    <div class="relative flex min-h-screen flex-col bg-background">
-        <div class="themes-wrapper bg-background">
-                <main class="relative flex min-h-svh flex-1 flex-col bg-background peer-data-[variant=inset]:min-h-[calc(100svh-theme(spacing.4))] md:peer-data-[variant=inset]:m-2 md:peer-data-[state=collapsed]:peer-data-[variant=inset]:ml-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:shadow">
-                    <div class="flex flex-1 flex-col gap-4 p-5 pt-5">
-                        <h1 class="scroll-m-20 text-3xl font-bold tracking-tight">
-                            {% block page_title %}{% endblock page_title %}
-                        </h1>
-                        {% block content %}
-                        {% endblock content %}
-                    </div>
-                </main>
-        </div>
+  <div class="relative flex min-h-screen flex-col bg-background">
+    <header class="bg-background border-b border-gray-700 p-4 flex justify-between items-center">
+    <div class="ascii-art text-blue-500">e
+ <pre>  ________.__  __   _________              ___.     </pre>
+ <pre> /  _____/|__|/  |_ \_   ___ \____________ \_ |__   </pre>
+ <pre>/   \  ___|  \   __\/    \  \/\_  __ \__  \ | __ \  </pre> 
+ <pre>\    \_\  \  ||  |  \     \____|  | \// __ \| \_\ \ </pre>
+ <pre> \______  /__||__|   \______  /|__|  (____  /___  / </pre>
+ <pre>        \/                  \/            \/    \/  </pre>
     </div>
+      <nav class="space-x-4">
+        <a href="/dashboard" class="text-blue-500 font-bold hover:text-blue-400">Home</a>
+        <a href="/git_repos" class="text-blue-500 font-bold hover:text-blue-400">My Repos</a>
+        <a href="/ssh_keys" class="text-blue-500 font-bold hover:text-blue-400">SSH Keys</a>
+        <a href="/logout" class="text-blue-500 font-bold hover:text-blue-400">Logout</a>
+      </nav>
+    </header>
+
+    <div class="themes-wrapper bg-background">
+      <main class="relative flex min-h-svh flex-1 flex-col bg-background peer-data-[variant=inset]:min-h-[calc(100svh-theme(spacing.4))] md:peer-data-[variant=inset]:m-2 md:peer-data-[state=collapsed]:peer-data-[variant=inset]:ml-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:shadow">
+        <div class="flex flex-1 flex-col gap-4 p-5 pt-5">
+          <h1 class="scroll-m-20 text-3xl font-bold tracking-tight">
+            {% block page_title %}{% endblock page_title %}
+          </h1>
+          {% block content %}{% endblock content %}
+        </div>
+      </main>
+    </div>
+  </div>
   {% block js %}
 
   {% endblock js %}

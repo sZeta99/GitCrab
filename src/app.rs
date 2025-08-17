@@ -1,6 +1,6 @@
+use axum::{extract::Request, http:: StatusCode, middleware::Next, response::{IntoResponse, Response}};
 use async_trait::async_trait;
-use axum::Router;
-use axum_session::{SessionConfig, SessionLayer, SessionNullPool, SessionStore};
+use axum::{response::Redirect, Router};
 use loco_rs::{
     app::{AppContext, Hooks, Initializer},
     bgworker::{BackgroundWorker, Queue},
@@ -13,6 +13,7 @@ use loco_rs::{
     Result,
 };
 use migration::Migrator;
+use tower::ServiceBuilder;
 use std::path::Path;
 
 #[allow(unused_imports)]
@@ -62,12 +63,19 @@ impl Hooks for App {
             .add_route(controllers::auth::routes())
             .add_route(controllers::home::routes())
     }
-
-
+    
     async fn connect_workers(ctx: &AppContext, queue: &Queue) -> Result<()> {
         queue.register(DownloadWorker::build(ctx)).await?;
         Ok(())
     }
+    async fn after_routes(router: Router, _ctx: &AppContext) -> Result<Router> {
+        Ok(router.layer(
+            ServiceBuilder::new().layer(axum::middleware::from_fn(redirect_unauthorized)),
+        ))
+    }
+
+
+
 
     #[allow(unused_variables)]
     fn register_tasks(tasks: &mut Tasks) {
@@ -85,3 +93,16 @@ impl Hooks for App {
 
 
 }
+async fn redirect_unauthorized(
+    req: Request,
+    next: Next,
+) -> Response {
+    let res = Next::run(next, req).await;
+
+    if res.status() == StatusCode::UNAUTHORIZED {
+        Redirect::to("/login").into_response()
+    } else {
+        res
+    }
+}
+

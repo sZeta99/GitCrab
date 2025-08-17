@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>GitCrab · Dashboard</title>
+    <style>
+        body {
+            font-family: monospace, monospace;
+            background: #0d1117;
+            color: #c9d1d9;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            padding: 1rem 2rem;
+            background: #161b22;
+            border-bottom: 1px solid #30363d;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .ascii-art {
+            white-space: pre;
+            font-size: 12px;
+            line-height: 1.2;
+            color: #58a6ff;
+        }
+
+        nav a {
+            color: #58a6ff;
+            text-decoration: none;
+            margin: 0 1rem;
+            font-weight: bold;
+            transition: color 0.2s;
+        }
+
+        nav a:hover {
+            color: #1f6feb;
+        }
+
+        main {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        h1 {
+            color: #f0f6fc;
+        }
+
+        .user-info {
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .repos {
+            text-align: left;
+        }
+
+        .repo-card {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            transition: border 0.2s;
+        }
+
+        .repo-card:hover {
+            border-color: #58a6ff;
+        }
+
+        .repo-card h3 {
+            margin: 0;
+            font-size: 1.1rem;
+        }
+
+        .repo-card a {
+            color: #58a6ff;
+            text-decoration: none;
+        }
+
+        footer {
+            margin-top: 3rem;
+            padding: 1rem;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #6e7681;
+            border-top: 1px solid #30363d;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="ascii-art">
+  ________.__  __   _________              ___.    
+ /  _____/|__|/  |_ \_   ___ \____________ \_ |__  
+/   \  ___|  \   __\/    \  \/\_  __ \__  \ | __ \ 
+\    \_\  \  ||  |  \     \____|  | \// __ \| \_\ \
+ \______  /__||__|   \______  /|__|  (____  /___  /
+        \/                  \/            \/    \/ 
+        </div>
+        <nav>
+            <a href="/repos">My Repos</a>
+            <a href="/ssh_keys">SSH Keys</a>
+            <a href="/logout">Logout</a>
+        </nav>
+    </header>
+
+    <main>
+        <div class="user-info">
+            <p><a href="/new_repo">➕ Create New Repository</a></p>
+        </div>
+
+        <section class="repos">
+            <h2>Your Repositories</h2>
+
+            <!-- Example repos, these would be rendered dynamically -->
+            <div class="repo-card">
+                <h3><a href="/repos/my-first-crab">my-first-crab</a></h3>
+                <p>🐙 A test repository</p>
+            </div>
+
+            <div class="repo-card">
+                <h3><a href="/repos/gitcrab-core">gitcrab-core</a></h3>
+                <p>🦀 The main GitCrab backend written in Rust</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2025 GitCrab · Built with 🦀 Rust</p>
+    </footer>
+</body>
+</html>
+

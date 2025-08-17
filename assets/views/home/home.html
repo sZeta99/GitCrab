@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>GitCrab</title>
+    <style>
+        body {
+            font-family: monospace, monospace;
+            background: #0d1117;
+            color: #c9d1d9;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            padding: 2rem;
+            background: #161b22;
+            border-bottom: 1px solid #30363d;
+        }
+
+        .ascii-art {
+            white-space: pre;
+            font-size: 14px;
+            line-height: 1.2;
+            margin: 0 auto;
+            color: #58a6ff;
+        }
+
+        h1 {
+            margin-top: 1rem;
+            color: #f0f6fc;
+        }
+
+        p {
+            color: #8b949e;
+        }
+
+        nav {
+            margin: 2rem 0;
+        }
+
+        nav a {
+            color: #58a6ff;
+            text-decoration: none;
+            margin: 0 1.5rem;
+            font-weight: bold;
+            transition: color 0.2s;
+        }
+
+        nav a:hover {
+            color: #1f6feb;
+        }
+
+        .auth-section {
+            margin: 3rem auto;
+            padding: 2rem;
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            width: 300px;
+        }
+
+        footer {
+            margin-top: 3rem;
+            padding: 1rem;
+            font-size: 0.9rem;
+            color: #6e7681;
+            border-top: 1px solid #30363d;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="ascii-art">
+  ________.__  __   _________              ___.    
+ /  _____/|__|/  |_ \_   ___ \____________ \_ |__  
+/   \  ___|  \   __\/    \  \/\_  __ \__  \ | __ \ 
+\    \_\  \  ||  |  \     \____|  | \// __ \| \_\ \
+ \______  /__||__|   \______  /|__|  (____  /___  /
+        \/                  \/            \/    \/ 
+        </div>
+        <h1>Welcome to GitCrab</h1>
+        <p>A GitHub-like service built with Rust 🦀</p>
+    </header>
+
+    <nav>
+        <a href="/login">Login</a>
+        <a href="/register">Register</a>
+    </nav>
+
+    <div class="auth-section">
+        <h2>Get started</h2>
+        <p>Create an account and start hosting your Rust-powered repositories today.</p>
+        <p>
+            <a href="/register">👉 Register now</a>
+        </p>
+    </div>
+
+    <footer>
+        <p>© 2025 GitCrab · Built with 🦀 Rust</p>
+    </footer>
+</body>
+</html>
+

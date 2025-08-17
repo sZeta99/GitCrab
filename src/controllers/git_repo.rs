@@ -2,8 +2,7 @@
 #![allow(clippy::unnecessary_struct_initialization)]
 #![allow(clippy::unused_async)]
 use std::path::PathBuf;
-
-use chrono::{DateTime, FixedOffset, Local, TimeZone, Utc};
+use chrono::Local;
 use loco_rs::{controller::middleware, prelude::*};
 use serde::{Deserialize, Serialize};
 use axum::response::Redirect;
@@ -105,7 +104,7 @@ pub async fn add(
     let item = ActiveModel { 
         created_at: ActiveValue::set(local_now.with_timezone(local_now.offset())), 
         updated_at: ActiveValue::set(local_now.with_timezone(local_now.offset())), 
-        id: ActiveValue::set(0), 
+        id: ActiveValue::NotSet,
         name:  ActiveValue::set(params.name.clone()), 
         path:  ActiveValue::set(Some(path.unwrap().to_string_lossy().to_string()))
     };
