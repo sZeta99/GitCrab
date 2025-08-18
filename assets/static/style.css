@@ -1,115 +1,65 @@
-/* === GitCrab Global Styles === */
-body {
-    font-family: monospace, monospace;
-    background: #0d1117;
-    color: #c9d1d9;
-    margin: 0;
-    padding: 0;
-}
+        body {
+            font-family: monospace, monospace;
+            background: #0d1117;
+            color: #c9d1d9;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
 
-/* === Header & Navigation === */
-header {
-    padding: 1rem 2rem;
-    background: #161b22;
-    border-bottom: 1px solid #30363d;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
+        header {
+            padding: 2rem;
+            background: #161b22;
+            border-bottom: 1px solid #30363d;
+        }
 
-.ascii-art {
-    white-space: pre;
-    font-size: 12px;
-    line-height: 1.2;
-    color: #58a6ff;
-}
+        .ascii-art {
+            white-space: pre;
+            font-size: 14px;
+            line-height: 1.2;
+            margin: 0 auto;
+            color: #58a6ff;
+        }
 
-nav a {
-    color: #58a6ff;
-    text-decoration: none;
-    margin: 0 1rem;
-    font-weight: bold;
-    transition: color 0.2s;
-}
+        h1 {
+            margin-top: 1rem;
+            color: #f0f6fc;
+        }
 
-nav a:hover {
-    color: #1f6feb;
-}
+        p {
+            color: #8b949e;
+        }
 
-/* === Main Content === */
-main {
-    max-width: 900px;
-    margin: 2rem auto;
-    padding: 0 1rem;
-}
+        nav {
+            margin: 2rem 0;
+        }
 
-h1 {
-    color: #f0f6fc;
-}
+        nav a {
+            color: #58a6ff;
+            text-decoration: none;
+            margin: 0 1.5rem;
+            font-weight: bold;
+            transition: color 0.2s;
+        }
 
-.user-info {
-    margin-bottom: 2rem;
-    padding: 1rem;
-    background: #161b22;
-    border: 1px solid #30363d;
-    border-radius: 8px;
-    text-align: center;
-}
+        nav a:hover {
+            color: #1f6feb;
+        }
 
-.user-info a {
-    color: #58a6ff;
-    text-decoration: none;
-    font-weight: bold;
-}
+        .auth-section {
+            margin: 3rem auto;
+            padding: 2rem;
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            width: 300px;
+        }
 
-.user-info a:hover {
-    color: #1f6feb;
-}
-
-/* === Repository List === */
-.repos {
-    text-align: left;
-}
-
-.repos h2 {
-    margin-bottom: 1rem;
-    color: #c9d1d9;
-}
-
-.repo-card {
-    background: #161b22;
-    border: 1px solid #30363d;
-    border-radius: 6px;
-    padding: 1rem;
-    margin-bottom: 1rem;
-    transition: border 0.2s;
-}
-
-.repo-card:hover {
-    border-color: #58a6ff;
-}
-
-.repo-card h3 {
-    margin: 0;
-    font-size: 1.1rem;
-}
-
-.repo-card a {
-    color: #58a6ff;
-    text-decoration: none;
-}
-
-.repo-card a:hover {
-    color: #1f6feb;
-}
-
-/* === Footer === */
-footer {
-    margin-top: 3rem;
-    padding: 1rem;
-    text-align: center;
-    font-size: 0.9rem;
-    color: #6e7681;
-    border-top: 1px solid #30363d;
-}
+        footer {
+            margin-top: 3rem;
+            padding: 1rem;
+            font-size: 0.9rem;
+            color: #6e7681;
+            border-top: 1px solid #30363d;
+        }
 
