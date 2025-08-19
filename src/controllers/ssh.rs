@@ -3,30 +3,26 @@
 #![allow(clippy::unused_async)]
 use loco_rs::prelude::*;
 use serde::{Deserialize, Serialize};
+use axum::response::Redirect;
+use axum_extra::extract::Form;
 use sea_orm::{sea_query::Order, QueryOrder};
 use axum::debug_handler;
+use tracing::{event, Level};
 
 use crate::{
-    models::_entities::ssh_keys::{ActiveModel, Column, Entity, Model},
-    views,
+    models::_entities::sshes::{ActiveModel, Column, Entity, Model}, services::ssh_service::SshKeyService, views
 };
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Params {
-    pub user_id: Option<i32>,
-    pub title: Option<String>,
-    pub key_type: Option<String>,
     pub public_key: Option<String>,
-    pub fingerprint: Option<String>,
+    pub title: Option<String>,
     }
 
 impl Params {
     fn update(&self, item: &mut ActiveModel) {
-      item.user_id = Set(self.user_id.clone());
-      item.title = Set(self.title.clone());
-      item.key_type = Set(self.key_type.clone());
       item.public_key = Set(self.public_key.clone());
-      item.fingerprint = Set(self.fingerprint.clone());
+      item.title = Set(self.title.clone());
       }
 }
 
@@ -44,7 +40,7 @@ pub async fn list(
         .order_by(Column::Id, Order::Desc)
         .all(&ctx.db)
         .await?;
-    views::ssh_keys::list(&v, &item)
+    views::ssh::list(&v, &item)
 }
 
 #[debug_handler]
@@ -52,20 +48,20 @@ pub async fn new(
     ViewEngine(v): ViewEngine<TeraView>,
     State(_ctx): State<AppContext>,
 ) -> Result<Response> {
-    views::ssh_keys::create(&v)
+    views::ssh::create(&v)
 }
 
 #[debug_handler]
 pub async fn update(
     Path(id): Path<i32>,
     State(ctx): State<AppContext>,
-    Json(params): Json<Params>,
-) -> Result<Response> {
+    Form(params): Form<Params>,
+) -> Result<Redirect> {
     let item = load_item(&ctx, id).await?;
     let mut item = item.into_active_model();
     params.update(&mut item);
-    let _ = item.update(&ctx.db).await?;
-    format::render().redirect_with_header_key("HX-Redirect", "/ssh_keys")
+    item.update(&ctx.db).await?;
+    Ok(Redirect::to("../sshes"))
 }
 
 #[debug_handler]
@@ -75,7 +71,7 @@ pub async fn edit(
     State(ctx): State<AppContext>,
 ) -> Result<Response> {
     let item = load_item(&ctx, id).await?;
-    views::ssh_keys::edit(&v, &item)
+    views::ssh::edit(&v, &item)
 }
 
 #[debug_handler]
@@ -85,20 +81,27 @@ pub async fn show(
     State(ctx): State<AppContext>,
 ) -> Result<Response> {
     let item = load_item(&ctx, id).await?;
-    views::ssh_keys::show(&v, &item)
+    views::ssh::show(&v, &item)
 }
 
 #[debug_handler]
 pub async fn add(
     State(ctx): State<AppContext>,
-    Json(params): Json<Params>,
-) -> Result<Response> {
+    Form(params): Form<Params>,
+) -> Result<Redirect> {
     let mut item = ActiveModel {
         ..Default::default()
     };
     params.update(&mut item);
-    let _ = item.insert(&ctx.db).await?;
-    format::render().redirect_with_header_key("HX-Redirect", "/ssh_keys")
+    let saved = item.insert(&ctx.db).await?;
+
+    event!(Level::INFO, "something has happened!");
+
+    let service = SshKeyService::new(env!("GIT_HOME")); 
+    service.add_key(&saved)
+        .map_err(|e| Error::Message(format!("Failed to add key to authorized_keys: {e}")))?;
+    event!(Level::INFO, "Redirect!");
+    Ok(Redirect::to("sshes"))
 }
 
 #[debug_handler]
@@ -109,13 +112,12 @@ pub async fn remove(Path(id): Path<i32>, State(ctx): State<AppContext>) -> Resul
 
 pub fn routes() -> Routes {
     Routes::new()
-        .prefix("ssh_keys/")
+        .prefix("sshes/")
         .add("/", get(list))
         .add("/", post(add))
         .add("new", get(new))
         .add("{id}", get(show))
         .add("{id}/edit", get(edit))
         .add("{id}", delete(remove))
-        .add("{id}", put(update))
-        .add("{id}", patch(update))
+        .add("{id}", post(update))
 }

@@ -1,6 +1,6 @@
 use sea_orm::entity::prelude::*;
-pub use super::_entities::ssh_keys::{ActiveModel, Model, Entity};
-pub type SshKeys = Entity;
+pub use super::_entities::sshes::{ActiveModel, Model, Entity};
+pub type Sshes = Entity;
 
 #[async_trait::async_trait]
 impl ActiveModelBehavior for ActiveModel {

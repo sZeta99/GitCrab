@@ -55,7 +55,7 @@ impl Hooks for App {
 
     fn routes(_ctx: &AppContext) -> AppRoutes {
         AppRoutes::with_default_routes() // controller routes below
-            .add_route(controllers::ssh_keys::routes())
+            .add_route(controllers::ssh::routes())
             .add_route(controllers::register::routes())
             .add_route(controllers::login::routes())
             .add_route(controllers::mysession::routes())
@@ -105,4 +105,3 @@ async fn redirect_unauthorized(
         res
     }
 }
-

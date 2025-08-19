@@ -7,16 +7,13 @@ pub struct Migration;
 #[async_trait::async_trait]
 impl MigrationTrait for Migration {
     async fn up(&self, m: &SchemaManager) -> Result<(), DbErr> {
-        create_table(m, "ssh_keys",
+        create_table(m, "sshes",
             &[
             
             ("id", ColType::PkAuto),
             
-            ("user_id", ColType::IntegerNull),
-            ("title", ColType::StringNull),
-            ("key_type", ColType::StringNull),
             ("public_key", ColType::StringNull),
-            ("fingerprint", ColType::StringNull),
+            ("title", ColType::StringNull),
             ],
             &[
             ]
@@ -24,6 +21,6 @@ impl MigrationTrait for Migration {
     }
 
     async fn down(&self, m: &SchemaManager) -> Result<(), DbErr> {
-        drop_table(m, "ssh_keys").await
+        drop_table(m, "sshes").await
     }
 }
