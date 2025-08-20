@@ -13,6 +13,11 @@ pub struct Model {
     pub public_key: Option<String>,
     pub title: Option<String>,
 }
+impl Model {
+    pub(crate) fn as_bytes(&self) -> &[u8] {
+        todo!()
+    }
+}
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {}

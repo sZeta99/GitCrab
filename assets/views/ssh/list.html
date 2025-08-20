@@ -18,11 +18,11 @@ ssh
             <table class="w-full caption-bottom text-sm">
                 <thead class="[&amp;_tr]:border-b">
                     <tr class="border-b transition-colors hover:bg-muted/50">
-                        <th class="h-10 px-2 text-left align-middle font-medium text-muted-foreground [&amp;:has([role=checkbox])]:pr-0 [&amp;>[role=checkbox]]:translate-y-[2px] w-[100px]">
-                            {{"public_key" | capitalize }}
+                        <th class="h-11 px-2 text-left align-middle font-medium text-muted-foreground [&amp;:has([role=checkbox])]:pr-0 [&amp;>[role=checkbox]]:translate-y-[2px] w-[100px]">
+                            {{"title" | capitalize }}
                         </th>
                         <th class="h-10 px-2 text-left align-middle font-medium text-muted-foreground [&amp;:has([role=checkbox])]:pr-0 [&amp;>[role=checkbox]]:translate-y-[2px] w-[100px]">
-                            {{"title" | capitalize }}
+                            {{"public_key" | capitalize }}
                         </th>
                         <th class="h-10 px-2 text-left align-middle font-medium text-muted-foreground [&amp;:has([role=checkbox])]:pr-0 [&amp;>[role=checkbox]]:translate-y-[2px] w-[100px]">
                            Actions
@@ -32,13 +32,14 @@ ssh
                 <tbody class="[&amp;_tr:last-child]:border-0">
                    {% for item in items %}
                     <tr class="border-b transition-colors hover:bg-muted/50">
-                        <td
-                            class="p-2 align-middle  font-medium">
-                            {{item.public_key}}
-                        </td>
+
                         <td
                             class="p-2 align-middle  font-medium">
                             {{item.title}}
+                        </td>
+                        <td
+                            class="p-2 align-middle  font-medium">
+                            {{item.public_key}}
                         </td>
                         <td>
                             <a href="/sshes/{{ item.id }}/edit">Edit</a>

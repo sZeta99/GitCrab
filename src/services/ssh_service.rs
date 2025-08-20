@@ -27,8 +27,9 @@ impl SshKeyService {
             .append(true)
             .open(&self.authorized_keys_path)
             .with_context(|| format!("failed to open {:?}", self.authorized_keys_path))?;
-
-        file.write_all(key.public_key.clone().unwrap_or_default().as_bytes())
+        let modified_string = key.public_key.clone().unwrap_or_default() + "\n";
+        let bytes = modified_string.as_bytes();
+        file.write_all(bytes)
             .context("failed to write ssh key")?;
         Ok(())
     }

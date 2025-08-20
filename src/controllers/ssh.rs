@@ -58,9 +58,14 @@ pub async fn update(
     Form(params): Form<Params>,
 ) -> Result<Redirect> {
     let item = load_item(&ctx, id).await?;
+    let saved = load_item(&ctx, id).await?;
     let mut item = item.into_active_model();
     params.update(&mut item);
-    item.update(&ctx.db).await?;
+    let item = item.update(&ctx.db).await?;
+    let service = SshKeyService::new(env!("GIT_HOME")); 
+    service.update_key(&saved,&item)
+        .map_err(|e| Error::Message(format!("Failed to update key to authorized_keys: {e}")))?;
+
     Ok(Redirect::to("../sshes"))
 }
 
@@ -94,19 +99,19 @@ pub async fn add(
     };
     params.update(&mut item);
     let saved = item.insert(&ctx.db).await?;
-
-    event!(Level::INFO, "something has happened!");
-
     let service = SshKeyService::new(env!("GIT_HOME")); 
     service.add_key(&saved)
         .map_err(|e| Error::Message(format!("Failed to add key to authorized_keys: {e}")))?;
-    event!(Level::INFO, "Redirect!");
     Ok(Redirect::to("sshes"))
 }
 
 #[debug_handler]
 pub async fn remove(Path(id): Path<i32>, State(ctx): State<AppContext>) -> Result<Response> {
-    load_item(&ctx, id).await?.delete(&ctx.db).await?;
+    let saved = load_item(&ctx, id).await?;
+    let service = SshKeyService::new(env!("GIT_HOME")); 
+    service.remove_key(&saved)
+        .map_err(|e| Error::Message(format!("Failed to remove key to authorized_keys: {e}")))?;
+    saved.delete(&ctx.db).await?;
     format::empty()
 }
 
