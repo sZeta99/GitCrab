@@ -42,9 +42,10 @@ unic-langid = { version = "0.9.4" }
 # /view engine
 axum-extra = { version = "0.10", features = ["form"] }
 axum_session = { version = "0.16"  }
-tower = "0.5"  # Latest stable version
-
-tower-http = "0.6"  # Contains HandleErrorLayer
+tower = "0.5"
+thiserror = "2.0.16"
+tower-http = "0.6"
+urlencoding = "2.1.3"
 [[bin]]
 name = "gitcrab-cli"
 path = "src/bin/main.rs"

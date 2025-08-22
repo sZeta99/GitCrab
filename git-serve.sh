@@ -38,38 +38,46 @@ check_repo_exists() {
     fi
 }
 
+# Add safe directory exception
+add_safe_directory() {
+    local repo_path="\$1"
+    sudo -u git git config --global --add safe.directory "$repo_path"
+}
+
 # Handle Git commands
 case "$SSH_ORIGINAL_COMMAND" in
     "git-upload-pack "*)
         REPO_NAME=$(parse_repo_name "$SSH_ORIGINAL_COMMAND")
         REPO_PATH="$REPO_BASE/$REPO_NAME"
-
         log_message "UPLOAD-PACK request for repository: $REPO_NAME"
 
         if check_repo_exists "$REPO_PATH"; then
             log_message "Repository found, executing git-upload-pack"
-            exec git-upload-pack "$REPO_PATH"
+            add_safe_directory "$REPO_PATH"
+            sudo -u git git-upload-pack "$REPO_PATH"
         else
             log_message "ERROR: Repository not found: $REPO_PATH"
             echo "Repository '$REPO_NAME' not found"
             exit 1
         fi
         ;;
+
     "git-receive-pack "*)
         REPO_NAME=$(parse_repo_name "$SSH_ORIGINAL_COMMAND")
         REPO_PATH="$REPO_BASE/$REPO_NAME"
-
         log_message "RECEIVE-PACK request for repository: $REPO_NAME"
 
         if check_repo_exists "$REPO_PATH"; then
             log_message "Repository found, executing git-receive-pack"
-            exec git-receive-pack "$REPO_PATH"
+            add_safe_directory "$REPO_PATH"
+            sudo -u git git-receive-pack "$REPO_PATH"
         else
             log_message "ERROR: Repository not found: $REPO_PATH"
             echo "Repository '$REPO_NAME' not found"
             exit 1
         fi
         ;;
+
     *)
         log_message "ERROR: Invalid Git command: $SSH_ORIGINAL_COMMAND"
         echo "Invalid Git command. Only git-upload-pack and git-receive-pack are supported."

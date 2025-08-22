@@ -24,7 +24,6 @@ pub async fn home(
 pub fn routes() -> Routes {
     Routes::new()
         .prefix("/")
-        .add("/dashboard", get(dashboard))
         .add("/", get(home))
 
 }

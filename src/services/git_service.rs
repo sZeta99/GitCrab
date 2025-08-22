@@ -100,20 +100,5 @@ impl GitService {
         Ok(())
     }
 
-    pub async fn list_repositories(&self) -> Result<Vec<String>> {
-        let mut repositories = Vec::new();
-        let mut entries = fs::read_dir(&self.repo_base_path).await?;
 
-        while let Some(entry) = entries.next_entry().await? {
-            if let Some(name) = entry.file_name().to_str() {
-                if name.ends_with(".git") {
-                    if let Some(repo_name) = name.strip_suffix(".git") {
-                        repositories.push(repo_name.to_string());
-                    }
-                }
-            }
-        }
-
-        Ok(repositories)
-    }
 }

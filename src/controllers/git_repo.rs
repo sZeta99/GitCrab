@@ -5,13 +5,14 @@ use std::path::PathBuf;
 use chrono::Local;
 use loco_rs::{controller::middleware, prelude::*};
 use serde::{Deserialize, Serialize};
-use axum::response::Redirect;
+use axum::{http::StatusCode, response::Redirect};
 use axum_extra::extract::Form;
 use sea_orm::{sea_query::Order, QueryOrder};
 use axum::debug_handler;
+use tracing::{error, info};
 
 use crate::{
-    models::_entities::git_repos::{ActiveModel, Column, Entity, Model}, services::git_service::GitService, views
+    models::_entities::git_repos::{ActiveModel, Column, Entity, Model}, services::git::GitService, views
 };
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -56,16 +57,43 @@ pub async fn new(
 
 #[debug_handler]
 pub async fn update(
+
     auth: middleware::auth::JWT,
+
     Path(id): Path<i32>,
+
     State(ctx): State<AppContext>,
+
     Form(params): Form<Params>,
+
 ) -> Result<Redirect> {
+
     let item = load_item(&ctx, id).await?;
     let mut item = item.into_active_model();
+    let old_name = item.name.clone().unwrap().unwrap_or_default();
+    let new_name = params.name.clone().unwrap_or_default();
+
+    if old_name == new_name {
+        info!("The repository name is unchanged; no action required.");
+        return Ok(Redirect::to("../git_repos"));
+    }
+    let git_service = GitService::new(PathBuf::new().join(env!("REPO_BASE_PATH")));
+    if let Err(err) = git_service.rename_repository(&old_name, &new_name).await {
+        error!("Failed to rename repository '{}' to '{}': {}", old_name, new_name, err);
+        // Redirect with the error message in the URL
+        return Ok(Redirect::to(&format!("../git_repos?error={}", urlencoding::encode(&format!("Failed to rename repository: {}", err)))));
+    }
     params.update(&mut item);
-    item.update(&ctx.db).await?;
+    if let Err(err) = item.update(&ctx.db).await {
+        error!("Failed to update repository in the database: {}", err);
+        if let Err(rollback_err) = git_service.rename_repository(&new_name, &old_name).await {
+            error!("Failed to rollback filesystem rename: {}", rollback_err);
+        }
+        return Ok(Redirect::to(&format!("../git_repos?error={}", urlencoding::encode(&format!("Failed to update repository in the database: {}", err)))));
+    }
+    info!("Successfully updated repository '{}' to '{}'", old_name, new_name);
     Ok(Redirect::to("../git_repos"))
+
 }
 
 #[debug_handler]
@@ -76,6 +104,7 @@ pub async fn edit(
     State(ctx): State<AppContext>,
 ) -> Result<Response> {
     let item = load_item(&ctx, id).await?;
+
     views::git_repo::edit(&v, &item)
 }
 
@@ -98,7 +127,7 @@ pub async fn add(
     Form(params): Form<Params>,
 ) -> Result<Redirect> {
 
-    let service = GitService::new(PathBuf::new().join(env!("REPO_BASE_PATH")),"user".to_string());
+    let service = GitService::new(PathBuf::new().join(env!("REPO_BASE_PATH")));
     let path = service.create_bare_repository(&params.name.clone().unwrap()).await;
     let local_now = Local::now();
     let item = ActiveModel { 
@@ -114,7 +143,11 @@ pub async fn add(
 
 #[debug_handler]
 pub async fn remove(Path(id): Path<i32>, State(ctx): State<AppContext>) -> Result<Response> {
-    load_item(&ctx, id).await?.delete(&ctx.db).await?;
+    let service = GitService::new(PathBuf::new().join(env!("REPO_BASE_PATH")));
+    let item = load_item(&ctx, id).await?;
+    let _ = service.delete_repository(&item.name.unwrap()).await;
+    let item = load_item(&ctx, id).await?;
+    item.delete(&ctx.db).await?;
     format::empty()
 }
 
