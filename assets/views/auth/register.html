@@ -3,35 +3,54 @@
 <head>
   <meta charset="UTF-8">
   <title>Register</title>
-  <style>
-    body { font-family: sans-serif; margin:2rem; }
-    .form-group { margin-bottom:1rem; }
-    label { display:block; margin-bottom:.5rem; }
-    input { width:100%; padding:.5rem; box-sizing:border-box; }
-    button { padding:.5rem 1rem; }
-    .msg { margin-top:1rem; }
-    .msg.error { color:red; }
-    .msg.success { color:green; }
-  </style>
+    <img
+      src="/static/image.png"
+      alt="Logo"
+      width="320"
+      height="auto"
+      class="logo"
+    >
+   <link rel="stylesheet" href="/static/style.css">
+
 </head>
 <body>
   <h1>Register</h1>
-  <form id="registerForm">
+<div class="auth-section">
+  <form id="registerForm" autocomplete="on">
     <div class="form-group">
       <label for="name">Username</label>
-      <input id="name" type="text" name="name" required>
+      <input
+        id="name"
+        name="name"
+        type="text"
+        placeholder="your_username"
+        required
+      />
     </div>
     <div class="form-group">
       <label for="email">Email</label>
-      <input id="email" type="email" name="email" required>
+      <input
+        id="email"
+        name="email"
+        type="email"
+        placeholder="you@example.com"
+        required
+      />
     </div>
     <div class="form-group">
       <label for="password">Password</label>
-      <input id="password" type="password" name="password" required>
+      <input
+        id="password"
+        name="password"
+        type="password"
+        placeholder="••••••••"
+        required
+      />
     </div>
     <button type="submit">Register</button>
     <div id="responseMessage" class="msg"></div>
   </form>
+</div>
   <p>Already have an account? <a href="/login">Login</a></p>
 
   <script>

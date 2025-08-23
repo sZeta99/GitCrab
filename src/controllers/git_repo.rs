@@ -5,7 +5,7 @@ use std::path::PathBuf;
 use chrono::Local;
 use loco_rs::{controller::middleware, prelude::*};
 use serde::{Deserialize, Serialize};
-use axum::{http::StatusCode, response::Redirect};
+use axum::response::Redirect;
 use axum_extra::extract::Form;
 use sea_orm::{sea_query::Order, QueryOrder};
 use axum::debug_handler;
@@ -14,6 +14,8 @@ use tracing::{error, info};
 use crate::{
     models::_entities::git_repos::{ActiveModel, Column, Entity, Model}, services::git::GitService, views
 };
+
+const USER : &str = "git";
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Params {
@@ -77,7 +79,7 @@ pub async fn update(
         info!("The repository name is unchanged; no action required.");
         return Ok(Redirect::to("../git_repos"));
     }
-    let git_service = GitService::new(PathBuf::new().join(env!("REPO_BASE_PATH")));
+    let git_service = GitService::new(PathBuf::new().join(env!("REPO_BASE_PATH")),USER);
     if let Err(err) = git_service.rename_repository(&old_name, &new_name).await {
         error!("Failed to rename repository '{}' to '{}': {}", old_name, new_name, err);
         // Redirect with the error message in the URL
@@ -127,7 +129,7 @@ pub async fn add(
     Form(params): Form<Params>,
 ) -> Result<Redirect> {
 
-    let service = GitService::new(PathBuf::new().join(env!("REPO_BASE_PATH")));
+    let service = GitService::new(PathBuf::new().join(env!("REPO_BASE_PATH")),USER);
     let path = service.create_bare_repository(&params.name.clone().unwrap()).await;
     let local_now = Local::now();
     let item = ActiveModel { 
@@ -143,7 +145,7 @@ pub async fn add(
 
 #[debug_handler]
 pub async fn remove(Path(id): Path<i32>, State(ctx): State<AppContext>) -> Result<Response> {
-    let service = GitService::new(PathBuf::new().join(env!("REPO_BASE_PATH")));
+    let service = GitService::new(PathBuf::new().join(env!("REPO_BASE_PATH")),USER);
     let item = load_item(&ctx, id).await?;
     let _ = service.delete_repository(&item.name.unwrap()).await;
     let item = load_item(&ctx, id).await?;

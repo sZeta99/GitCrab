@@ -1,33 +1,46 @@
 <!DOCTYPE html><html>
 <head>
-    <style>
-        body { font-family: sans-serif; margin:2rem; }
-        .form-group { margin-bottom:1rem; }
-        label { display:block; margin-bottom:.5rem; }
-        input { width:100%; padding:.5rem; box-sizing:border-box; }
-        button { padding:.5rem 1rem; }
-        .msg { margin-top:1rem; }
-        .msg.error { color:red; }
-        .msg.success { color:green; }
-    </style>
 
     <title>Login</title>
+     <link rel="stylesheet" href="/static/style.css">
+
 </head>
 <body>
     <h1>Login</h1>
-    <form id="loginForm">
+    <img
+      src="/static/image.png"
+      alt="Logo"
+      width="300"
+      height="auto"
+      class="logo"
+    >
+    <div class="auth-section">
+  <form id="loginForm" autocomplete="on">
     <div class="form-group">
       <label for="email">Email</label>
-      <input id="email" type="email" name="email" required>
+      <input
+        id="email"
+        name="email"
+        type="email"
+        placeholder="you@example.com"
+        required
+      />
     </div>
     <div class="form-group">
       <label for="password">Password</label>
-      <input id="password" type="password" name="password" required>
+      <input
+        id="password"
+        name="password"
+        type="password"
+        placeholder="••••••••"
+        required
+      />
     </div>
     <button type="submit">Login</button>
     <div id="responseMessage" class="msg"></div>
   </form>
-    <p>Don't have an account? <a href="/register">Register</a></p><script>
+</div>
+        <p>Don't have an account? <a href="/register">Register</a></p><script>
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         

@@ -1,6 +1,7 @@
 
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use std::fs::{self, create_dir_all};
+use std::process::Command;
 use tracing::{error, info, warn, debug};
 use thiserror::Error;
 
@@ -20,12 +21,13 @@ pub enum GitServiceError {
 /// A service for managing Git repositories on the filesystem.
 pub struct GitService {
     base_path: PathBuf,
+    user: String
 }
 
 impl GitService {
     /// Create a new GitService instance with a base path and user.
-    pub fn new(base_path: PathBuf) -> Self {
-        Self { base_path }
+    pub fn new(base_path: PathBuf, user: &str) -> Self {
+        Self { base_path, user: user.to_string()}
     }
 
     /// Centralized method to build the repository path from its name.
@@ -86,6 +88,22 @@ impl GitService {
             .arg(&repo_path)
             .output()
             .await;
+        // Set proper ownership
+        let chown_output = match Command::new("chown")
+                    .args(["-R", &format!("{}:{}", &self.user, &self.user)])
+                    .arg(&repo_path)
+                    .output() {
+            Ok(it) => it,
+            Err(e) => return Err(GitServiceError::FilesystemError(format!(
+                    "Failed to set ownership: {:?}",
+                    e
+                ))),
+        };
+
+        if !chown_output.status.success() {
+            warn!("Failed to set repository ownership: {}", 
+                  String::from_utf8_lossy(&chown_output.stderr));
+        }
 
         match git_init_result {
             Ok(output) if output.status.success() => {
