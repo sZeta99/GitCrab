@@ -9,7 +9,7 @@ use axum::response::Redirect;
 use axum_extra::extract::Form;
 use sea_orm::{sea_query::Order, QueryOrder};
 use axum::debug_handler;
-use tracing::{error, info};
+use tracing::{error, info, warn};
 
 use crate::{
     models::_entities::git_repos::{ActiveModel, Column, Entity, Model}, services::git::GitService, views
@@ -59,13 +59,9 @@ pub async fn new(
 
 #[debug_handler]
 pub async fn update(
-
     auth: middleware::auth::JWT,
-
     Path(id): Path<i32>,
-
     State(ctx): State<AppContext>,
-
     Form(params): Form<Params>,
 
 ) -> Result<Redirect> {
@@ -123,34 +119,79 @@ pub async fn show(
 }
 
 #[debug_handler]
+
 pub async fn add(
     auth: middleware::auth::JWT,
     State(ctx): State<AppContext>,
     Form(params): Form<Params>,
 ) -> Result<Redirect> {
 
-    let service = GitService::new(PathBuf::new().join(env!("REPO_BASE_PATH")),USER);
-    let path = service.create_bare_repository(&params.name.clone().unwrap()).await;
+    let service = GitService::new(PathBuf::new().join(env!("REPO_BASE_PATH")), USER);
+    let repo_name = params.name.clone().unwrap_or_default();
+
+    // Handle the Result from create_bare_repository
+    let path = match service.create_bare_repository(&repo_name).await {
+        Ok(path) => path,
+        Err(err) => {
+            error!("Failed to create repository '{}': {}", repo_name, err);
+            // Redirect with the error message in the URL
+            return Ok(Redirect::to(&format!("git_repos?error={}", 
+                urlencoding::encode(&format!("Failed to create repository: {}", err)))));
+        }
+    };
+
     let local_now = Local::now();
     let item = ActiveModel { 
         created_at: ActiveValue::set(local_now.with_timezone(local_now.offset())), 
         updated_at: ActiveValue::set(local_now.with_timezone(local_now.offset())), 
         id: ActiveValue::NotSet,
-        name:  ActiveValue::set(params.name.clone()), 
-        path:  ActiveValue::set(Some(path.unwrap().to_string_lossy().to_string()))
+        name: ActiveValue::set(params.name.clone()), 
+        path: ActiveValue::set(Some(path.to_string_lossy().to_string()))
     };
-    item.insert(&ctx.db).await?;
+
+    // Handle database insertion error as well
+    if let Err(err) = item.insert(&ctx.db).await {
+        error!("Failed to insert repository '{}' into database: {}", repo_name, err);
+
+        // You might want to clean up the created repository here if needed
+        let _ = service.delete_repository(&repo_name).await;
+        // service.delete_repository(&repo_name).await;
+        return Ok(Redirect::to(&format!("git_repos?error={}", 
+            urlencoding::encode(&format!("Failed to save repository to database: {}", err)))));
+    }
+    info!("Successfully created repository '{}'", repo_name);
     Ok(Redirect::to("git_repos"))
 }
 
 #[debug_handler]
+
 pub async fn remove(Path(id): Path<i32>, State(ctx): State<AppContext>) -> Result<Response> {
-    let service = GitService::new(PathBuf::new().join(env!("REPO_BASE_PATH")),USER);
+
+    let service = GitService::new(PathBuf::new().join(env!("REPO_BASE_PATH")), USER);
     let item = load_item(&ctx, id).await?;
-    let _ = service.delete_repository(&item.name.unwrap()).await;
-    let item = load_item(&ctx, id).await?;
-    item.delete(&ctx.db).await?;
+    let repo_name = item.name.clone().unwrap_or_default();
+
+    // Handle the Result from delete_repository
+    if let Err(err) = service.delete_repository(&repo_name).await {
+        error!("Failed to delete repository '{}': {}", repo_name, err);
+        // Return redirect with error message
+        return Ok(Redirect::to(&format!("git_repos?error={}", 
+            urlencoding::encode(&format!("Failed to delete repository: {}", err))))
+            .into_response());
+    }
+
+    // Handle database deletion error
+    if let Err(err) = item.delete(&ctx.db).await {
+        error!("Failed to delete repository '{}' from database: {}", repo_name, err);
+        warn!("Repository '{}' was deleted from filesystem but not from database", repo_name);
+        return Ok(Redirect::to(&format!("git_repos?error={}", 
+            urlencoding::encode(&format!("Failed to remove repository from database: {}", err))))
+            .into_response());
+
+    }
+    info!("Successfully deleted repository '{}'", repo_name);
     format::empty()
+
 }
 
 pub fn routes() -> Routes {

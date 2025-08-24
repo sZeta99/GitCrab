@@ -30,6 +30,17 @@
         <a href="#" id="logout" class="text-blue-500 font-bold hover:text-blue-400">Logout</a>
       </nav>
     </header>
+      
+    <!-- Error Display Section -->
+    <div id="error-display" class="fixed bottom-4 right-4 hidden">
+      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+        <strong class="font-bold">Error: </strong>
+        <span class="block sm:inline" id="error-message"></span>
+        <button id="error-close" class="absolute top-0 right-0 px-3 py-1">
+          <span class="text-red-700">&times;</span>
+        </button>
+      </div>
+    </div>
 
     <div class="themes-wrapper bg-background">
       <main class="relative flex min-h-svh flex-1 flex-col bg-background peer-data-[variant=inset]:min-h-[calc(100svh-theme(spacing.4))] md:peer-data-[variant=inset]:m-2 md:peer-data-[state=collapsed]:peer-data-[variant=inset]:ml-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:shadow">
@@ -51,11 +62,39 @@
     function deleteCookie(name) {
       document.cookie = name + '=; Max-Age=0; path=/; SameSite=Lax';
     }
+        // Error handling
+
+    function displayError(message) {
+      const errorDisplay = document.getElementById('error-display');
+      const errorMessage = document.getElementById('error-message');
+      errorMessage.textContent = message;
+      errorDisplay.classList.remove('hidden');
+    }
+
+    function hideError() {
+      const errorDisplay = document.getElementById('error-display');
+      errorDisplay.classList.add('hidden');
+    }
+
+    // Close error button handler
+    document.getElementById('error-close').addEventListener('click', hideError);
+
+    // Check URL for error parameter
+    function checkForError() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const errorMessage = urlParams.get('error');
+      if (errorMessage) {
+        displayError(decodeURIComponent(errorMessage));
+        // Clean the URL by removing the error parameter
+        window.history.replaceState(null, '', window.location.pathname);
+      }
+    }
+
     document.getElementById('logout').addEventListener('click', function(e) {
     e.preventDefault();            // stop normal navigation
     deleteCookie('auth-token');    // remove the session cookie
     window.location.href = '/';    // send them back to home
-  });
+    });
 
 
     function confirmDelete(event, delete_url, redirect_to) {
@@ -73,6 +112,7 @@
     }
 
     document.addEventListener('DOMContentLoaded', function () {
+            checkForError();
             document.querySelectorAll('.add-more').forEach(button => {
                 button.addEventListener('click', function () {
                     const group = this.getAttribute('data-group');
