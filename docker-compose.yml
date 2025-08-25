@@ -41,6 +41,18 @@ services:
     env_file:
       - .env
 
+      
+  mail:
+    image: axllent/mailpit:latest
+    container_name: gitcrab-mail
+    ports:
+      - "1025:1025"  # SMTP port
+      - "8025:8025"  # Web UI port
+    environment:
+      - MP_SMTP_AUTH_ALLOW_INSECURE=true
+    networks:
+      - db
+
 volumes:
   postgres_data:
   git_repositories:  # For Git repositories persistence

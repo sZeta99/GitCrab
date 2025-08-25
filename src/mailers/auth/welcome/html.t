@@ -2,12 +2,12 @@
 
 <body>
   Dear {{name}},
-  Welcome to Loco! You can now log in to your account.
+  Welcome to GitCrab! You can now log in to your account.
   Before you get started, please verify your account by clicking the link below:
   <a href="{{domain}}/api/auth/verify/{{verifyToken}}">
     Verify Your Account
   </a>
-  <p>Best regards,<br>The Loco Team</p>
+  <p>Best regards,<br>The GitCrab Team</p>
 </body>
 
 </html>
