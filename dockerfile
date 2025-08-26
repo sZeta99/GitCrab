@@ -39,7 +39,6 @@ RUN useradd -m -d /home/git -s /usr/bin/git-shell git && \
 # Copy scripts
 COPY git-serve.sh /home/git/git-shell-commands/git-serve
 COPY start.sh /usr/local/bin/start.sh
-COPY id_rsa.pub /home/git/.ssh/id_rsa.pub
 
 # Set permissions for scripts
 RUN chmod +x /home/git/git-shell-commands/git-serve && \

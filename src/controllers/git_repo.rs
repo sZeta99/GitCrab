@@ -12,7 +12,7 @@ use axum::debug_handler;
 use tracing::{error, info, warn};
 
 use crate::{
-    models::_entities::git_repos::{ActiveModel, Column, Entity, Model}, services::git::GitService, views
+    models::_entities::git_repos::{ActiveModel, Column, Entity, Model}, services::git_service::GitService, views
 };
 
 const USER : &str = "git";
