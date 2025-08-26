@@ -480,7 +480,6 @@ struct SshKey {
     public_key: String,
     created_at: DateTime,
 }
-```
 
 Grazie a **SeaORM**, le operazioni database-agnostiche possono essere eseguite in modo type-safe, migliorando affidabilità e leggibilità del codice.
 
