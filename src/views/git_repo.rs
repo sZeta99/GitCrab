@@ -1,6 +1,6 @@
 use loco_rs::prelude::*;
 
-use crate::models::_entities::git_repos;
+use crate::{models::_entities::git_repos, services::repo_retrive_service::RepoResponse};
 
 /// Render a list view of `git_repos`.
 ///
@@ -16,8 +16,8 @@ pub fn list(v: &impl ViewRenderer, items: &Vec<git_repos::Model>) -> Result<Resp
 /// # Errors
 ///
 /// When there is an issue with rendering the view.
-pub fn show(v: &impl ViewRenderer, item: &git_repos::Model) -> Result<Response> {
-    format::render().view(v, "git_repo/show.html", data!({"item": item}))
+pub fn show(v: &impl ViewRenderer, item: &git_repos::Model, data: RepoResponse) -> Result<Response> {
+    format::render().view(v, "git_repo/show.html", data!({"item": item,"data": data}))
 }
 
 /// Render a `git_repo` create form.

@@ -1,7 +1,7 @@
 #![allow(clippy::missing_errors_doc)]
 #![allow(clippy::unnecessary_struct_initialization)]
 #![allow(clippy::unused_async)]
-use std::path::PathBuf;
+use std::{fs, path::PathBuf};
 use chrono::Local;
 use loco_rs::{controller::middleware, prelude::*};
 use serde::{Deserialize, Serialize};
@@ -12,7 +12,7 @@ use axum::debug_handler;
 use tracing::{error, info, warn};
 
 use crate::{
-    models::_entities::git_repos::{ActiveModel, Column, Entity, Model}, services::git_service::GitService, views
+    models::_entities::git_repos::{ActiveModel, Column, Entity, Model}, services::{git_service::GitService, repo_retrive_service::{clone_bare_repo, count_files_in_structure, get_total_size_from_structure, read_repository_structure, RepoResponse}}, views
 };
 
 const USER : &str = "git";
@@ -115,7 +115,50 @@ pub async fn show(
 ) -> Result<Response> {
 
     let item = load_item(&ctx, id).await?;
-    views::git_repo::show(&v, &item)
+     info!("Fetching repository structure for repo: {}", item.name.clone().unwrap());
+    
+    // In a real application, you might fetch repo info from database
+    // For now, we'll assume the repo_id corresponds to a directory path
+    let bare_repo_path = PathBuf::new().join(env!("REPO_BASE_PATH")).join(format!("{}.git",&item.name.clone().unwrap()));
+    
+    info!("Repo Path : {}", bare_repo_path.to_str().unwrap());
+    if !bare_repo_path.exists() {
+        return Err(Error::NotFound);
+    }
+    let worktree_path = PathBuf::from(format!("./worktrees/{}", item.name.clone().unwrap()));
+
+    // Clone the bare repository into a working directory
+    if !worktree_path.exists() {
+
+        fs::create_dir_all(&worktree_path.parent().unwrap())?;
+
+        clone_bare_repo(&bare_repo_path, &worktree_path)?;
+
+    }
+
+    match read_repository_structure(&worktree_path, &worktree_path) {
+        Ok(structure) => {
+            let total_files = count_files_in_structure(&structure);
+            let total_size = get_total_size_from_structure(&structure);
+            
+            let response = RepoResponse {
+                id: item.id.to_string(),
+                name: item.name.clone().unwrap(),
+                structure,
+                total_files,
+                total_size,
+            };
+            
+            info!("Successfully fetched repository structure");
+            views::git_repo::show(&v, &item, response)
+        }
+        Err(e) => {
+            error!("Failed to read repository structure: {}", e);
+            Err(Error::InternalServerError)
+        }
+    }
+
+    
 }
 
 #[debug_handler]

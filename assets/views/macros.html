@@ -1,0 +1,23 @@
+<!-- Macro to recursively render repository structure -->
+{% macro render_repo_structure(structure) %}
+<ul>
+    <li>
+        <strong>{{ structure.name }}</strong>
+        {% if structure.is_file %}
+            (File) - Size: {{ structure.size | default(value=0) }} bytes
+            {% if structure.extension %}
+                - Extension: {{ structure.extension }}
+            {% endif %}
+        {% else %}
+            (Directory)
+        {% endif %}
+        {% if structure.children | length > 0%}
+            <ul>
+                {% for child in structure.children %}
+                    {{ self::render_repo_structure(structure=child) | safe }}
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </li>
+</ul>
+{% endmacro %}
