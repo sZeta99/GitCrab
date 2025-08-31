@@ -3,6 +3,7 @@
 #![allow(clippy::unused_async)]
 use std::{fs, path::PathBuf};
 use chrono::Local;
+use git2::Repository;
 use loco_rs::{controller::middleware, prelude::*};
 use serde::{Deserialize, Serialize};
 use axum::response::Redirect;
@@ -12,7 +13,7 @@ use axum::debug_handler;
 use tracing::{error, info, warn};
 
 use crate::{
-    models::_entities::git_repos::{ActiveModel, Column, Entity, Model}, services::{git_service::GitService, repo_retrive_service::{clone_bare_repo, count_files_in_structure, get_total_size_from_structure, read_repository_structure, RepoResponse}}, views
+    models::_entities::git_repos::{ActiveModel, Column, Entity, Model}, services::{git_service::GitService, repo_retrive_service::{count_files_in_structure, get_total_size_from_structure, read_git_repository_structure, RepoResponse}}, views
 };
 
 const USER : &str = "git";
@@ -125,22 +126,20 @@ pub async fn show(
     if !bare_repo_path.exists() {
         return Err(Error::NotFound);
     }
-    let worktree_path = PathBuf::from(format!("./worktrees/{}", item.name.clone().unwrap()));
 
-    // Clone the bare repository into a working directory
-    if !worktree_path.exists() {
+    // Open the bare repository directly
+    let repo = Repository::open_bare(&bare_repo_path)
+        .map_err(|e| {
+            error!("Failed to open bare repository: {}", e);
+            Error::InternalServerError
+        })?;
 
-        fs::create_dir_all(&worktree_path.parent().unwrap())?;
+    // Read the repository structure directly from Git objects
+    match read_git_repository_structure(&repo) {
 
-        clone_bare_repo(&bare_repo_path, &worktree_path)?;
-
-    }
-
-    match read_repository_structure(&worktree_path, &worktree_path) {
         Ok(structure) => {
             let total_files = count_files_in_structure(&structure);
             let total_size = get_total_size_from_structure(&structure);
-            
             let response = RepoResponse {
                 id: item.id.to_string(),
                 name: item.name.clone().unwrap(),

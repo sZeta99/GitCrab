@@ -1,54 +1,79 @@
 {% extends "base.html" %}
+
 {% import "macros.html" as macros %}
+
 {% block title %}
+
 GitCrab - {{ item.name }}
+
 {% endblock title %}
 
 {% block content %}
-<h1>View Repository: {{ item.name }}</h1>
 
-<div class="mb-10">
-    <!-- Repository Metadata -->
-    <div>
-        <label><strong>ID:</strong> {{ item.id }}</label>
+<div style="display: flex; height: 100vh; overflow: hidden;">
+
+    <!-- Explorer Panel -->
+
+    <div id="explorer-panel" style="width: 300px; background-color: #2b2d42; color: #edf2f4; padding: 10px; overflow-y: auto;">
+
+        <h3>Explorer</h3>
+
+        {{ macros::render_repo_structure(structure=data.structure) | safe }}
+
     </div>
-    <div>
-        <label><strong>Name:</strong> {{ item.name }}</label>
+
+    <!-- Content Viewer Panel -->
+
+    <div id="content-viewer" style="flex-grow: 1; background-color: #edf2f4; padding: 20px; overflow-y: auto;">
+
+        <h3 id="fileNameHeading" style="display: none;">File Content</h3>
+
+        <pre id="fileContentText" style="white-space: pre-wrap; word-wrap: break-word; overflow-x: auto; display: none; background-color: white; padding: 10px; border-radius: 5px;"></pre>
+
     </div>
-    <div>
-        <label><strong>Path:</strong> {{ item.path }}</label>
-    </div>
-    <div>
-        <label><strong>Total Files:</strong> {{ data.total_files }}</label>
-    </div>
-    <div>
-        <label><strong>Total Size:</strong> {{ data.total_size }} bytes</label>
-    </div>
+
 </div>
 
-<!-- Repository Structure -->
-<div>
-    <label><strong>File Structure:</strong></label>
-    {{ macros::render_repo_structure(structure=data.structure) | safe }}
-</div>
 
-<!-- File Content (if applicable) -->
-{% if file_content %}
-<div>
-    <label><strong>File Content:</strong></label>
-    <pre>{{ file_content.content }}</pre>
-    <div>
-        <label><strong>File Size:</strong> {{ file_content.size }} bytes</label>
-    </div>
-    <div>
-        <label><strong>File Type:</strong> {% if file_content.is_binary %}Binary{% else %}Text{% endif %}</label>
-    </div>
-</div>
-{% endif %}
-
-<hr />
-
-<a href="/git_repos">Back to Git Repositories</a>
 {% endblock content %}
+{% block js %}
 
+<script>
+ // Toggle visibility of directories
 
+    function toggleDirectory(element) {
+
+        const nestedUl = element.nextElementSibling;
+
+        if (nestedUl) {
+
+            nestedUl.style.display = nestedUl.style.display === 'block' ? 'none' : 'block';
+
+        }
+
+    }
+
+    // Load and display content of the clicked file
+
+    function loadContent(fileName, content) {
+
+        const fileHeading = document.getElementById('fileNameHeading');
+
+        const fileContentText = document.getElementById('fileContentText');
+
+        // Display content panel
+
+        fileHeading.style.display = 'block';
+
+        fileContentText.style.display = 'block';
+
+        // Update content details
+
+        fileHeading.textContent = `File: ${fileName}`;
+
+        fileContentText.textContent = content.trim() || 'No content available.';
+
+    }
+
+</script>
+{% endblock js %}

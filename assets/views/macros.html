@@ -1,23 +1,57 @@
-<!-- Macro to recursively render repository structure -->
 {% macro render_repo_structure(structure) %}
-<ul>
+
+<ul style="list-style: none; padding-left: 10px;">
+
     <li>
-        <strong>{{ structure.name }}</strong>
+
         {% if structure.is_file %}
-            (File) - Size: {{ structure.size | default(value=0) }} bytes
-            {% if structure.extension %}
-                - Extension: {{ structure.extension }}
-            {% endif %}
+
+            <!-- File Handling -->
+
+            <span 
+
+                class="file" 
+
+                style="cursor: pointer;" 
+
+                onclick="loadContent('{{ structure.name }}', `{{ structure.content }}`)"
+
+            >
+
+                📄 {{ structure.name }}
+
+            </span>
+
         {% else %}
-            (Directory)
-        {% endif %}
-        {% if structure.children | length > 0%}
-            <ul>
+
+            <!-- Directory Handling -->
+
+            <span class="dir" style="cursor: pointer;" onclick="toggleDirectory(this)">
+
+                📂 {{ structure.name }}
+
+            </span>
+
+            {% if structure.children | length > 0 %}
+
+            <ul style="display: none; padding-left: 15px;">
+
                 {% for child in structure.children %}
+
                     {{ self::render_repo_structure(structure=child) | safe }}
+
                 {% endfor %}
+
             </ul>
+
+            {% endif %}
+
         {% endif %}
+
     </li>
+
 </ul>
+
 {% endmacro %}
+
+

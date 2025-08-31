@@ -1,6 +1,14 @@
 # Multi-stage build for efficient image size
 FROM rust:1.83.0-slim as builder
 
+# Install dependencies
+RUN apt-get update && \
+    apt-get install -y \
+        pkg-config \
+        libssl-dev && \
+    rm -rf /var/lib/apt/lists/*
+
+
 WORKDIR /usr/src/
 COPY . .
 RUN cargo build --release
