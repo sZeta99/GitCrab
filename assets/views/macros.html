@@ -1,55 +1,30 @@
 {% macro render_repo_structure(structure) %}
 
 <ul style="list-style: none; padding-left: 10px;">
-
     <li>
-
         {% if structure.is_file %}
-
             <!-- File Handling -->
-
             <span 
-
                 class="file" 
-
                 style="cursor: pointer;" 
-
                 onclick="loadContent('{{ structure.name }}', `{{ structure.content }}`)"
-
             >
-
                 📄 {{ structure.name }}
-
             </span>
-
         {% else %}
-
             <!-- Directory Handling -->
-
             <span class="dir" style="cursor: pointer;" onclick="toggleDirectory(this)">
-
                 📂 {{ structure.name }}
-
             </span>
-
             {% if structure.children | length > 0 %}
-
             <ul style="display: none; padding-left: 15px;">
-
                 {% for child in structure.children %}
-
                     {{ self::render_repo_structure(structure=child) | safe }}
-
                 {% endfor %}
-
             </ul>
-
             {% endif %}
-
         {% endif %}
-
     </li>
-
 </ul>
 
 {% endmacro %}

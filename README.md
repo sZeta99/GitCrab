@@ -12,6 +12,31 @@ L'obiettivo di GitCrab è offrire una piattaforma per la gestione efficiente e s
 - Creare e gestire repository con funzionalità complete CRUD.
 - Gestire chiavi SSH per il potenziamento della sicurezza.
 - Interagire con i propri repository tramite comandi Git in un ambiente SSH integrato.
+## Installazione
+
+Per avviare l'applicativo sara negessario il seguente set-up:
+- Predisporre un sitema avente docker installato, possibilmente a base linux, in quanto testato estensivamente su esso, possibilmente tramite WSL2 se su Windows, il sistema essendo compartimentato tramite DOcker puo essere eseguito su ogni sistema ma l'uso di git nello specifico protebbe risultare piu complicato
+
+- Clonare/Importare il progetto nel proprio sistema in una directory a piacere 
+
+- eseguire il comando `docker compose build` per generare l'immagine del progetto
+
+- eseguire il comando `docker compose up` eseguire il progetto, sara' richiesta una connesione a internet per permettere a Docker di scaricare le immagini necessare.
+
+
+## Come usare
+- Accedere al servizio tramite browser(testing svolto con Firefox) alla porta `localhost:5051`
+- Registare un account nella sezione Register
+- Sara possibile visonare una mail di beneventuo attravarso il servizio mailpit disponibile in `localhost:8025`
+- Accedere tramite la sezione Login
+- Creare un repository nella sezione MyRepo
+- Aggiungere una chiave publica valida per il prorpio sistema all'interno della sezione ssh.
+- clonare il repository nel proprio sistema tramite il comando disponibile nella sezione MyRepo
+- modificare il repository
+- Commitare i propri cambiamenti
+- Cliccare su il nome del repository nella sezione MyRepo 
+- Visonare i cambiamenti all'interno del explorer fornito
+- Logaout tramite l'apposito pulsante nel heder 
 
 ## Pattern MVC
 
