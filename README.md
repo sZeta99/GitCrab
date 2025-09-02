@@ -192,10 +192,6 @@ Tutte le operazioni—successi, errori o comandi non autorizzati—vengono regis
 
 - **Scalabilità**: la separazione tra servizio SSH e logica applicativa permette di replicare o bilanciare il carico dei comandi Git in ambienti cluster.
 
----
-
-**In sintesi**, il server SSH di GitCrab unisce sicurezza, trasparenza e piena compati
-
 # Autenticazione
 
 L'autenticazione in GitCrab è progettata per garantire una gestione sicura degli accessi degli utenti, utilizzando un approccio basato su **JSON Web Token (JWT)** e cookie per mantenere le sessioni.
@@ -299,7 +295,8 @@ L'architettura è suddivisa in componenti chiave:
 
 - Gli utenti possono accedere a una lista dei repository disponibili, che viene recuperata ordinando i record dal database.
 
-- È possibile visualizzare dettagli specifici sui repository, come data di creazione, percorso sul filesystem e nome.
+- È possibile visualizzare il contenuto della repository cliccando sul nome della reporitori nella lista di repositori, una sezione dedicata all'exploring del repositori permette all'utente di visionare il contenuto del repository
+![alt text](<Screenshot4.png>)
 
 ---
 
@@ -323,19 +320,9 @@ L'architettura è suddivisa in componenti chiave:
 
 Ogni operazione sul filesystem è progettata per includere una logica di rollback. Ad esempio:
 
-1. Se un aggiornamento del nome viene completato sul filesystem ma non sul database, viene eseguita un’inversione del nome sul filesystem.
+1. Se un aggiornamento del nome viene completat o sul filesystem ma non sul database, viene eseguita un’inversione del nome sul filesystem.
 
 2. Se una creazione di repository fallisce a livello del database, i file temporanei sul filesystem vengono ripuliti automaticamente.
-
----
-
-## Vantaggi del Design
-
-1. **Robustezza**: Grazie al rollback automatico e al controllo delle operazioni, il sistema garantisce consistenza dei dati anche in presenza di errori.
-
-2. **Scalabilità**: Supportando repository bare e utilizzando un design modulare (controller → servizio → filesystem), la gestione può essere estesa a cluster o ambienti distribuiti.
-
-3. **Facilità d’Uso**: L’interfaccia intuitiva semplifica la gestione dei repository, pur nascondendo complessità operative.
 
 # Gestione delle chiavi SSH
 

@@ -7,7 +7,7 @@ GitCrab - {{ item.name }}
 {% endblock title %}
 
 {% block content %}
-<div style="display: flex; height: 100vh; overflow: hidden;">
+<div style="display: flex; height: 75vh; overflow: hidden;">
     <!-- Explorer Panel -->
     <div id="explorer-panel" style="width: 300px; background-color: #2b2d42; color: #edf2f4; padding: 10px; overflow-y: auto;">
         <h3>Explorer</h3>
@@ -17,7 +17,7 @@ GitCrab - {{ item.name }}
     <!-- Content Viewer Panel -->
     <div id="content-viewer" style="flex-grow: 1; background-color: #494c4d; padding: 20px; overflow-y: auto;">
         <h3 id="fileNameHeading" style="display: none;">File Content</h3>
-        <pre id="fileContentText" style="white-space: pre-wrap; word-wrap: break-word; overflow-x: auto; display: none; background-color: black; padding: 10px; border-radius: 5px;"></pre>
+        <pre id="fileContentText" style="white-space: pre-wrap; word-wrap: break-word; overflow-x: auto; display: none; background-color: black; padding: 10px; border-radius: 5px; text-align: left;"></pre>
     </div>
 </div>
 
