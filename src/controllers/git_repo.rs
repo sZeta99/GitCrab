@@ -1,7 +1,7 @@
 #![allow(clippy::missing_errors_doc)]
 #![allow(clippy::unnecessary_struct_initialization)]
 #![allow(clippy::unused_async)]
-use std::{fs, path::PathBuf};
+use std::{path::PathBuf};
 use chrono::Local;
 use git2::Repository;
 use loco_rs::{controller::middleware, prelude::*};

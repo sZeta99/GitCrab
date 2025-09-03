@@ -1,19 +1,10 @@
 
-use axum::{
-    extract::{Path, Query, State},
-    response::Json,
-    http::StatusCode,
-};
-use git2::{Repository, ObjectType, TreeEntry, Oid};
+use git2::{Repository, ObjectType};
 use loco_rs::prelude::*;
 use serde::{Deserialize, Serialize};
 use std::{
-    collections::HashMap,
-    fs,
-    io,
-    path::{Path as StdPath, PathBuf},
+    path::{Path as StdPath},
 };
-use tracing::{error, info, warn};
 
 // Request/Response structures
 #[derive(Debug, Deserialize)]
@@ -69,13 +60,11 @@ pub fn read_git_repository_structure(repo: &Repository) -> Result<RepoStructure>
     let head = repo.head()
         .map_err(|e| -> Error {Error::string(&format!("Failed to get HEAD: {}", e))})?;
 
-
     let commit = head.peel_to_commit()
         .map_err(|e| -> Error {Error::string(&format!("Failed to get commit: {}", e))})?;
     
     let tree = commit.tree()
         .map_err(|e| -> Error {Error::string(&format!("Failed to get tree: {}", e))})?;
-    
 
     // Build structure from the root tree
     read_git_tree_structure(repo, &tree, "", "")
@@ -179,27 +168,16 @@ pub fn read_git_tree_structure(
 }
 
 pub fn should_ignore_git_entry(name: &str) -> bool {
-
     let ignored_dirs = ["node_modules", "target", ".vscode", ".idea"];
-
     let ignored_files = [".DS_Store", "Thumbs.db"];
-
-    
-
     ignored_dirs.contains(&name) || ignored_files.contains(&name) || name.starts_with('.')
-
 }
 
 pub fn get_file_extension_from_name(name: &str) -> Option<String> {
-
     StdPath::new(name)
-
         .extension()
-
         .and_then(|ext| ext.to_str())
-
         .map(|s| s.to_lowercase())
-
 }
 pub fn count_files_in_structure(structure: &RepoStructure) -> usize {
     if structure.is_file {

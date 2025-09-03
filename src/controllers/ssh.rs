@@ -7,7 +7,6 @@ use axum::response::Redirect;
 use axum_extra::extract::Form;
 use sea_orm::{sea_query::Order, QueryOrder};
 use axum::debug_handler;
-use tracing::{event, Level};
 
 use crate::{
     models::_entities::sshes::{ActiveModel, Column, Entity, Model}, services::ssh_service::SshKeyService, views
