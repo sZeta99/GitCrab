@@ -29,7 +29,7 @@
 - Add your public SSH key via the SSH section.
 ![alt text](<Screenshot3.png>)
 - Clone your repository using the provided link, make changes, and push or pull as needed.
-- View repository changes and content inside the web explorer, available by clicking on the name of the repo in the "MyRepo" Section.
+- View repository changes and content inside the web explorer, available by clicking on the name of the repo in the "MyRepos" Section.
 ![alt text](<Screenshot4.png>)
 - Logout via the dedicated UI button.
 

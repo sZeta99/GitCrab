@@ -53,7 +53,18 @@ pub struct ErrorResponse {
     pub error: String,
     pub message: String,
 }
-
+/// Reads the structure of a Git repository at its HEAD commit.
+///
+/// This function retrieves the `HEAD` reference, peels it to a commit,
+/// and then obtains the root tree. It delegates to `read_git_tree_structure`
+/// to build a full directory/file hierarchy.
+///
+/// # Arguments
+/// * `repo` - A reference to an open `git2::Repository`.
+///
+/// # Returns
+/// * `Ok(RepoStructure)` containing the full tree structure under `root`.
+/// * `Err(Error)` if any Git operation (head lookup, commit peel, tree peel) fails.
 pub fn read_git_repository_structure(repo: &Repository) -> Result<RepoStructure> {
 
     // Get the HEAD commit
@@ -71,6 +82,24 @@ pub fn read_git_repository_structure(repo: &Repository) -> Result<RepoStructure>
 
 }
 
+/// Recursively traverses a Git tree to build a nested `RepoStructure`.
+///
+/// # Arguments
+/// * `repo`  - A reference to the `git2::Repository`.
+/// * `tree`  - The current `git2::Tree` node to process.
+/// * `name`  - The name of this tree entry (empty for root).
+/// * `path`  - The full path from the repository root to this entry.
+///
+/// # Returns
+/// * `Ok(RepoStructure)` representing this directory or file and its children.
+/// * `Err(Error)` if any object lookup or type peel fails.
+///
+/// This function:
+/// 1. Iterates entries in `tree`.
+/// 2. Skips ignored names (via `should_ignore_git_entry`).
+/// 3. For subtrees, recurses and accumulates size and children.
+/// 4. For blobs, reads size, determines binary/text, and captures content+metadata.
+/// 5. Sorts children alphabetically before returning.
 pub fn read_git_tree_structure(
     repo: &Repository,
     tree: &git2::Tree,
@@ -167,18 +196,42 @@ pub fn read_git_tree_structure(
 
 }
 
+/// Determines if a Git tree entry should be ignored.
+///
+/// # Arguments
+/// * `name` - The filename or directory name to check.
+///
+/// # Returns
+/// * `true` if `name` is in a predefined ignore list or begins with a dot.
+/// * `false` otherwise.
 pub fn should_ignore_git_entry(name: &str) -> bool {
     let ignored_dirs = ["node_modules", "target", ".vscode", ".idea"];
     let ignored_files = [".DS_Store", "Thumbs.db"];
     ignored_dirs.contains(&name) || ignored_files.contains(&name) || name.starts_with('.')
 }
 
+/// Extracts the lowercase file extension from a filename.
+///
+/// # Arguments
+/// * `name` - The filename string (e.g., "main.rs").
+///
+/// # Returns
+/// * `Some(String)` with the extension in lowercase (e.g., "rs"), or
+/// * `None` if no extension is present or it's invalid UTF-8.
 pub fn get_file_extension_from_name(name: &str) -> Option<String> {
     StdPath::new(name)
         .extension()
         .and_then(|ext| ext.to_str())
         .map(|s| s.to_lowercase())
 }
+
+/// Recursively counts the total number of files in a `RepoStructure`.
+///
+/// # Arguments
+/// * `structure` - A reference to the root `RepoStructure`.
+///
+/// # Returns
+/// * The count of file nodes (`is_file == true`) within the hierarchy.
 pub fn count_files_in_structure(structure: &RepoStructure) -> usize {
     if structure.is_file {
         1
@@ -187,6 +240,13 @@ pub fn count_files_in_structure(structure: &RepoStructure) -> usize {
     }
 }
 
+/// Retrieves the total size recorded in a `RepoStructure`.
+///
+/// # Arguments
+/// * `structure` - A reference to a `RepoStructure`.
+///
+/// # Returns
+/// * The `size` field if present, otherwise `0`.
 pub fn get_total_size_from_structure(structure: &RepoStructure) -> u64 {
     structure.size.unwrap_or(0)
 }

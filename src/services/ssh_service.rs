@@ -18,7 +18,13 @@ impl SshKeyService {
         }
     }
 
-    /// Append a new key to authorized_keys
+    /// Constructs a new `SshKeyService` pointing to the given user's `~/.ssh/authorized_keys`.
+    ///
+    /// # Arguments
+    /// * `user_home` – The path to the user's home directory (e.g., `"/home/username"`).
+    ///
+    /// # Returns
+    /// A configured `SshKeyService` instance.
     pub fn add_key(&self, key: &Model) -> Result<()> {
         event!(Level::INFO, "something has happened!");
 
@@ -34,7 +40,16 @@ impl SshKeyService {
         Ok(())
     }
 
-    /// Remove a key (by fingerprint or exact match)
+    /// Appends a public SSH key to the `authorized_keys` file.
+    ///
+    /// This will create the file if it does not exist, then open it
+    /// for appending and write the key (plus a newline).
+    ///
+    /// # Arguments
+    /// * `key` – A `Model` containing at least the `public_key` string.
+    ///
+    /// # Errors
+    /// Returns an `Err` if the file cannot be opened or written.
     pub fn remove_key(&self, key: &Model) -> Result<()> {
         let contents = read_to_string(&self.authorized_keys_path)
             .with_context(|| "failed to read authorized_keys")?;
@@ -53,7 +68,16 @@ impl SshKeyService {
         Ok(())
     }
 
-    /// Update key = remove old one + add new one
+    /// Removes all occurrences of the specified public key from `authorized_keys`.
+    ///
+    /// Reads the entire file, filters out lines containing the key,
+    /// and writes the filtered contents back.
+    ///
+    /// # Arguments
+    /// * `key` – A `Model` containing the `public_key` to remove.
+    ///
+    /// # Errors
+    /// Returns an `Err` if the file cannot be read or the updated content cannot be written.
     pub fn update_key(&self, old_key: &Model, new_key: &Model) -> Result<()> {
         self.remove_key(old_key)?;
         self.add_key(new_key)?;

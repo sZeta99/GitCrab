@@ -25,12 +25,28 @@ pub struct GitService {
 }
 
 impl GitService {
-    /// Create a new GitService instance with a base path and user.
+    /// Creates a new instance of `GitService` with the specified base path and user.
+    ///
+    /// # Arguments
+    /// * `base_path` - The base directory where Git repositories will be stored.
+    /// * `user` - The user who owns the repositories.
+    ///
+    /// # Returns:wa
+    /// A new `GitService` instance.
     pub fn new(base_path: PathBuf, user: &str) -> Self {
         Self { base_path, user: user.to_string()}
     }
 
-    /// Centralized method to build the repository path from its name.
+    /// Constructs the repository path based on the repository name.
+    ///
+    /// # Arguments
+    /// * `name` - The name of the repository.
+    ///
+    /// # Returns
+    /// A `PathBuf` representing the repository path if the name is valid.
+    ///
+    /// # Errors
+    /// Returns `GitServiceError::InvalidRepositoryName` if the name is empty or contains invalid characters..
     fn get_repository_path(&self, name: &str) -> Result<PathBuf, GitServiceError> {
         if name.trim().is_empty() {
             return Err(GitServiceError::InvalidRepositoryName(
@@ -53,7 +69,16 @@ impl GitService {
         Ok(self.base_path.join(format!("{}.git", sanitized_name)))
     }
 
-    /// Create a bare Git repository.
+    /// Creates a bare Git repository.
+    ///
+    /// # Arguments
+    /// * `name` - The name of the repository to create.
+    ///
+    /// # Returns
+    /// A `PathBuf` representing the path of the newly created repository.
+    ///
+    /// # Errors
+    /// Returns `GitServiceError::FilesystemError` if the repository already exists or if directory creation fails.
     pub async fn create_bare_repository(&self, name: &str) -> Result<PathBuf, GitServiceError> {
         let repo_path = self.get_repository_path(name)?;
 
@@ -134,6 +159,15 @@ impl GitService {
     }
 
     /// Deletes a Git repository.
+    ///
+    /// # Arguments
+    /// * `name` - The name of the repository to delete.
+    ///
+    /// # Returns
+    /// `Ok(())` if the repository is successfully deleted.
+    ///
+    /// # Errors
+    /// Returns `GitServiceError::FilesystemError` if the repository does not exist or if deletion fails.
     pub async fn delete_repository(&self, name: &str) -> Result<(), GitServiceError> {
         let repo_path = self.get_repository_path(name)?;
 
@@ -165,7 +199,17 @@ impl GitService {
         }
     }
 
-    /// Move/Rename a Git repository.
+    /// Renames or moves a Git repository.
+    ///
+    /// # Arguments
+    /// * `old_name` - The current name of the repository.
+    /// * `new_name` - The new name for the repository.
+    ///
+    /// # Returns
+    /// `Ok(())` if the repository is successfully renamed.
+    ///
+    /// # Errors
+    /// Returns `GitServiceError::FilesystemError` if the source repository does not exist, the target already exists, or the rename operation fails.
     pub async fn rename_repository(
         &self,
         old_name: &str,
@@ -216,7 +260,10 @@ impl GitService {
         }
     }
 
-    /// Rollback a sequence of operations.
+    /// Rolls back a sequence of operations in case of failure.
+    ///
+    /// # Arguments
+    /// * `operations` - A vector of rollback steps to execute.
     async fn rollback(&self, operations: Vec<String>) {
         for operation in operations.into_iter().rev() {
             let parts: Vec<&str> = operation.splitn(2, ':').collect();
